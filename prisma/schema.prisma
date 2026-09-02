@@ -1,0 +1,292 @@
+// Light Advert — Phase 1 schema.
+// Mirrors docs/data-model.md. Domain rules (transitions, audit-reason enforcement,
+// lock enforcement, contribution math) live in src/server/domain, not here.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+enum TaskStatus {
+  ASSIGNED
+  IN_PROGRESS
+  REVIEW
+  COMPLETED
+  CANCELLED
+}
+
+enum Priority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+enum ProjectStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+enum AuditEventType {
+  ESTIMATE_CHANGED
+  STAMPED_ROLE_CHANGED
+  TASK_APPROVED
+  TASK_REASSIGNED
+  TASK_MANUALLY_RECORDED
+  PERIOD_LOCKED
+  PERIOD_UNLOCKED
+  APPROVED_TASK_CANCELLED
+}
+
+// ---------------------------------------------------------------------------
+// Better Auth — identity. `User` is the glossary's Staff Member / Admin login
+// identity. `role` (ADMIN | STAFF) and `status` (ACTIVE | DEACTIVATED) are kept
+// as plain strings so Better Auth's additionalFields map cleanly; allowed values
+// are enforced in src/server/auth and src/server/domain.
+// ---------------------------------------------------------------------------
+
+model User {
+  id            String   @id @default(uuid())
+  name          String
+  email         String   @unique
+  emailVerified Boolean  @default(false)
+  image         String?
+  role          String   @default("STAFF")
+  status        String   @default("ACTIVE")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  sessions Session[]
+  accounts Account[]
+
+  staffProfile StaffProfile?
+
+  tasksAssigned   Task[]          @relation("TaskAssignee")
+  tasksApproved   Task[]          @relation("TaskApprover")
+  tasksCreated    Task[]          @relation("TaskCreator")
+  projectsCreated Project[]       @relation("ProjectCreator")
+  deliverables    Deliverable[]
+  comments        Comment[]
+  auditActions    AuditEntry[]    @relation("AuditActor")
+  locksMade       PayPeriodLock[] @relation("LockLockedBy")
+  locksLifted     PayPeriodLock[] @relation("LockUnlockedBy")
+
+  @@map("user")
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  expiresAt DateTime
+  token     String   @unique
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id @default(uuid())
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@map("account")
+}
+
+model Verification {
+  id         String    @id @default(uuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime? @default(now())
+  updatedAt  DateTime? @updatedAt
+
+  @@map("verification")
+}
+
+// ---------------------------------------------------------------------------
+// Domain
+// ---------------------------------------------------------------------------
+
+model Role {
+  id         String   @id @default(uuid())
+  name       String   @unique
+  isSeed     Boolean  @default(false)
+  orderIndex Int      @default(0)
+  createdAt  DateTime @default(now())
+
+  roleAssignments RoleAssignment[]
+  taskTypes       TaskType[]
+  primaryOf       StaffProfile[]   @relation("PrimaryRole")
+  stampedTasks    Task[]           @relation("TaskStampedRole")
+
+  @@map("role")
+}
+
+model StaffProfile {
+  userId        String @id
+  user          User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  primaryRoleId String
+  primaryRole   Role   @relation("PrimaryRole", fields: [primaryRoleId], references: [id])
+
+  roleAssignments RoleAssignment[]
+
+  @@map("staff_profile")
+}
+
+model RoleAssignment {
+  staffProfileId String
+  staffProfile   StaffProfile @relation(fields: [staffProfileId], references: [userId], onDelete: Cascade)
+  roleId         String
+  role           Role         @relation(fields: [roleId], references: [id])
+
+  @@id([staffProfileId, roleId])
+  @@map("role_assignment")
+}
+
+model TaskType {
+  id     String @id @default(uuid())
+  roleId String
+  role   Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  label  String
+
+  @@unique([roleId, label])
+  @@map("task_type")
+}
+
+model Project {
+  id          String        @id @default(uuid())
+  name        String
+  status      ProjectStatus @default(ACTIVE)
+  deadline    DateTime      @db.Date
+  priority    Priority      @default(NORMAL)
+  clientLabel String?
+  brief       String?
+  isSeed      Boolean       @default(false)
+  createdById String
+  createdBy   User          @relation("ProjectCreator", fields: [createdById], references: [id])
+  createdAt   DateTime      @default(now())
+
+  tasks Task[]
+
+  @@map("project")
+}
+
+model Task {
+  id               String     @id @default(uuid())
+  title            String
+  projectId        String
+  project          Project    @relation(fields: [projectId], references: [id])
+  assigneeId       String
+  assignee         User       @relation("TaskAssignee", fields: [assigneeId], references: [id])
+  stampedRoleId    String
+  stampedRole      Role       @relation("TaskStampedRole", fields: [stampedRoleId], references: [id])
+  effortPoints     Int
+  status           TaskStatus @default(ASSIGNED)
+  type             String?
+  deadline         DateTime?  @db.Date
+  priority         Priority   @default(NORMAL)
+  brief            String?
+  approvalDate     DateTime?
+  approvedById     String?
+  approvedBy       User?      @relation("TaskApprover", fields: [approvedById], references: [id])
+  manuallyRecorded Boolean    @default(false)
+  createdById      String
+  createdBy        User       @relation("TaskCreator", fields: [createdById], references: [id])
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+
+  deliverables Deliverable[]
+  comments     Comment[]
+  auditEntries AuditEntry[]
+
+  @@index([status, approvalDate])
+  @@index([assigneeId, status])
+  @@index([projectId])
+  @@map("task")
+}
+
+model Deliverable {
+  id          String   @id @default(uuid())
+  taskId      String
+  task        Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  label       String
+  url         String
+  createdById String
+  createdBy   User     @relation(fields: [createdById], references: [id])
+  createdAt   DateTime @default(now())
+
+  @@map("deliverable")
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  taskId    String
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+  body      String
+  createdAt DateTime @default(now())
+
+  @@index([taskId, createdAt])
+  @@map("comment")
+}
+
+model PayPeriodLock {
+  id           String    @id @default(uuid())
+  startDate    DateTime  @db.Date
+  endDate      DateTime  @db.Date
+  lockedById   String
+  lockedBy     User      @relation("LockLockedBy", fields: [lockedById], references: [id])
+  lockedAt     DateTime  @default(now())
+  unlockedById String?
+  unlockedBy   User?     @relation("LockUnlockedBy", fields: [unlockedById], references: [id])
+  unlockedAt   DateTime?
+  unlockReason String?
+
+  auditEntries AuditEntry[]
+
+  @@map("pay_period_lock")
+}
+
+model AuditEntry {
+  id           String         @id @default(uuid())
+  eventType    AuditEventType
+  actorId      String
+  actor        User           @relation("AuditActor", fields: [actorId], references: [id])
+  taskId       String?
+  task         Task?          @relation(fields: [taskId], references: [id])
+  periodLockId String?
+  periodLock   PayPeriodLock? @relation(fields: [periodLockId], references: [id])
+  field        String?
+  oldValue     String?
+  newValue     String?
+  reason       String?
+  createdAt    DateTime       @default(now())
+
+  @@index([taskId, createdAt])
+  @@index([actorId, createdAt])
+  @@map("audit_entry")
+}
