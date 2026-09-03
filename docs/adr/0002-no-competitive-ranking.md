@@ -20,7 +20,9 @@ ranked "#1, #2, #3" leaderboard.
 - Cross-Role ranking was already identified in the requirements as unfair.
 - A rank *position* drives no decision that the underlying total does not; the totals are
   exactly what splitting a bonus pool needs.
-- A visible leaderboard in a small creative team carries a real morale cost.
+- A visible leaderboard in a small creative team carries a real morale cost — and the
+  sorted totals stay Admin-only anyway (a Staff Member sees only their own numbers, PRD
+  R43), which is what makes "no leaderboard" coherent rather than cosmetic.
 
 ## Consequences
 
