@@ -2,6 +2,10 @@
 
 Date: 2026-09-02
 
+## Status
+
+Accepted
+
 ## Context
 
 Pay decisions at Light Advert use a contribution-weighted bonus pool, so the system needs

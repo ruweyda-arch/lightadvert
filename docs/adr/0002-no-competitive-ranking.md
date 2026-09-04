@@ -2,6 +2,10 @@
 
 Date: 2026-09-02
 
+## Status
+
+Accepted
+
 ## Context
 
 The original requirements asked for a "Performance Ranking" that "automatically ranks staff

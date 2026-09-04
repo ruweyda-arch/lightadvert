@@ -2,6 +2,10 @@
 
 Date: 2026-09-02
 
+## Status
+
+Accepted
+
 ## Context
 
 The project has two loosely-related deliverables — a public marketing site and an internal
