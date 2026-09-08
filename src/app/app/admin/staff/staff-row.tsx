@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 
 import { ActionButton } from "@/components/action-button";
@@ -47,6 +48,9 @@ export function StaffRow({
         </div>
 
         <div className="ml-auto flex flex-wrap gap-2">
+          <Button size="sm" variant="ghost" asChild>
+            <Link href={`/app/admin/staff/${staff.id}`}>Contribution</Link>
+          </Button>
           <Button size="sm" variant="outline" onClick={() => setEditing((v) => !v)}>
             {editing ? "Close" : "Edit"}
           </Button>

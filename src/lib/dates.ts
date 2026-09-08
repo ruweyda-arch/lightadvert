@@ -35,3 +35,23 @@ export function formatEatDate(instant: Date): string {
     year: "numeric",
   }).format(instant);
 }
+
+/** The UTC instant of EAT-midnight for a `YYYY-MM-DD` string. */
+export function eatDayStartUtc(iso: string): Date {
+  const [y, m, d] = iso.split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1, d) - OFFSET_MS);
+}
+
+/** `YYYY-MM-DD` for an instant, in company time (for date inputs). */
+export function eatDateIso(instant: Date): string {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: COMPANY_TZ }).format(instant);
+}
+
+/** `YYYY-MM` for an instant, in company time (for grouping by pay month). */
+export function eatMonthKey(instant: Date): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: COMPANY_TZ,
+    year: "numeric",
+    month: "2-digit",
+  }).format(instant);
+}
