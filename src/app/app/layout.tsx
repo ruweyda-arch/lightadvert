@@ -2,6 +2,9 @@ import Link from "next/link";
 
 import { requireUser } from "@/server/auth/guards";
 
+// The whole authenticated area is per-request (session + DB). Never prerender.
+export const dynamic = "force-dynamic";
+
 export default async function AppLayout({ children }: LayoutProps<"/app">) {
   const session = await requireUser();
   const admin = session.user.role === "ADMIN";
