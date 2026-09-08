@@ -62,3 +62,13 @@ export function listAuditEntries(filters: AuditFilters = {}, take = 200) {
     },
   });
 }
+
+export type AuditEntryRow = Awaited<ReturnType<typeof listAuditEntries>>[number];
+
+/** Everyone who could be an audit actor, for the filter dropdown. */
+export function listActorOptions() {
+  return prisma.user.findMany({
+    orderBy: { name: "asc" },
+    select: { id: true, name: true },
+  });
+}

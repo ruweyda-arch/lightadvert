@@ -9,6 +9,17 @@ export type AuditEventType =
   | "PERIOD_UNLOCKED"
   | "APPROVED_TASK_CANCELLED";
 
+export const AUDIT_EVENT_TYPES: readonly AuditEventType[] = [
+  "ESTIMATE_CHANGED",
+  "STAMPED_ROLE_CHANGED",
+  "TASK_APPROVED",
+  "TASK_REASSIGNED",
+  "TASK_MANUALLY_RECORDED",
+  "PERIOD_LOCKED",
+  "PERIOD_UNLOCKED",
+  "APPROVED_TASK_CANCELLED",
+];
+
 /** Events the domain layer must refuse without a non-empty `reason`. */
 export const REASON_REQUIRED: ReadonlySet<AuditEventType> = new Set([
   "ESTIMATE_CHANGED",
