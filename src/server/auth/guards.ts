@@ -2,9 +2,9 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { auth, type Session } from "@/server/auth";
+import { ADMIN_IDLE_TIMEOUT_MS } from "@/server/auth/policy";
 
-/** Admin sessions additionally time out after 2 hours idle (docs/prd.md R6). */
-export const ADMIN_IDLE_TIMEOUT_MS = 2 * 60 * 60 * 1000;
+export { ADMIN_IDLE_TIMEOUT_MS };
 
 export type SessionUser = Session["user"];
 
@@ -22,8 +22,8 @@ export async function requireUser(): Promise<Session> {
 export async function requireAdmin(): Promise<Session> {
   const session = await requireUser();
   if (session.user.role !== "ADMIN") redirect("/app");
-  // TODO(auth R6): enforce ADMIN_IDLE_TIMEOUT_MS via a last-activity cookie or a
-  // session field; Better Auth's rolling `updateAge` is not a last-activity marker.
+  // The 2-hour Admin idle timeout (R6) is enforced in src/middleware.ts, which
+  // owns the `la` / `role_hint` cookies and can both check and refresh them.
   return session;
 }
 

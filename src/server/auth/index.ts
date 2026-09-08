@@ -3,9 +3,8 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { nextCookies } from "better-auth/next-js";
 
 import { prisma } from "@/server/db/client";
+import { SESSION_MAX_AGE_S, MIN_PASSWORD_LENGTH } from "@/server/auth/policy";
 import { sendPasswordEmail } from "@/server/email/resend";
-
-const THIRTY_DAYS = 60 * 60 * 24 * 30;
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, { provider: "postgresql" }),
@@ -14,9 +13,10 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     disableSignUp: true,
-    minPasswordLength: 8, // docs/prd.md R4
+    minPasswordLength: MIN_PASSWORD_LENGTH,
     maxPasswordLength: 128,
     requireEmailVerification: false,
+    resetPasswordTokenExpiresIn: 60 * 60, // 1 hour
     async sendResetPassword({ user, url }) {
       await sendPasswordEmail({
         to: user.email,
@@ -27,10 +27,22 @@ export const auth = betterAuth({
   },
 
   // 30-day rolling session for everyone. The Admin's additional 2-hour idle
-  // timeout (docs/prd.md R6) is enforced in ./guards.ts, not here.
+  // timeout (docs/prd.md R6) is enforced in src/middleware.ts.
   session: {
-    expiresIn: THIRTY_DAYS,
+    expiresIn: SESSION_MAX_AGE_S,
     updateAge: 60 * 60 * 24,
+  },
+
+  // docs/prd.md R7. Better Auth's in-memory limiter is a per-instance backstop;
+  // the cross-instance guard is the explicit Upstash check the credential server
+  // actions run (src/server/actions/auth.ts + src/server/ratelimit/upstash.ts).
+  rateLimit: {
+    enabled: true,
+    customRules: {
+      "/sign-in/email": { window: 300, max: 5 },
+      "/request-password-reset": { window: 900, max: 5 },
+      "/reset-password": { window: 900, max: 10 },
+    },
   },
 
   user: {
@@ -40,9 +52,8 @@ export const auth = betterAuth({
     },
   },
 
-  // TODO(auth): breached-password check against the HaveIBeenPwned range API
-  // (docs/prd.md R4) — wire via emailAndPassword.password.hash guard or a
-  // pre-hook once the invite/set-password flow lands.
+  // The breached-password check (docs/prd.md R4) runs in the reset-password
+  // server action (src/server/actions/auth.ts) before Better Auth is called.
 
   plugins: [nextCookies()], // must stay last
 });
