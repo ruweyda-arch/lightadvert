@@ -7,8 +7,11 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  // Supabase: DATABASE_URL is the pooled connection (pgbouncer, :6543);
+  // DIRECT_URL is the direct connection (:5432) used for migrations.
+  directUrl = env("DIRECT_URL")
 }
 
 // ---------------------------------------------------------------------------
