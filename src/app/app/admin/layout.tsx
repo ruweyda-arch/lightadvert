@@ -7,6 +7,7 @@ const TABS = [
   ["/app/admin/projects", "Projects"],
   ["/app/admin/tasks", "Tasks"],
   ["/app/admin/reports", "Contribution"],
+  ["/app/admin/periods", "Pay periods"],
   ["/app/admin/workload", "Workload"],
   ["/app/admin/roles", "Roles"],
   ["/app/admin/staff", "Staff"],

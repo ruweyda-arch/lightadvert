@@ -14,9 +14,13 @@ export interface DateRange {
   end: Date;
 }
 
+/**
+ * A lock window as half-open UTC instants `[start, end)`. The DB layer
+ * (`loadActiveLocks`) converts stored EAT calendar dates into these.
+ */
 export interface LockWindow {
-  startDate: Date;
-  endDate: Date;
+  start: Date;
+  end: Date;
   unlockedAt: Date | null;
 }
 
@@ -26,22 +30,25 @@ export function monthlyPeriodFor(instant: Date): DateRange {
 }
 
 export function isInRange(instant: Date, range: DateRange): boolean {
-  return instant.getTime() >= range.start.getTime() && instant.getTime() < range.end.getTime();
+  return (
+    instant.getTime() >= range.start.getTime() &&
+    instant.getTime() < range.end.getTime()
+  );
 }
 
 /**
  * Whether an approved Task with the given Approval Date sits inside any active
- * lock window. `endDate` is treated as an inclusive calendar day.
+ * (not unlocked) lock window.
  */
 export function isApprovalDateLocked(
   approvalDate: Date,
   locks: readonly LockWindow[],
 ): boolean {
   const t = approvalDate.getTime();
-  return locks.some((lock) => {
-    if (lock.unlockedAt) return false;
-    const start = lock.startDate.getTime();
-    const endInclusive = lock.endDate.getTime() + 24 * 60 * 60 * 1000;
-    return t >= start && t < endInclusive;
-  });
+  return locks.some(
+    (lock) =>
+      lock.unlockedAt === null &&
+      t >= lock.start.getTime() &&
+      t < lock.end.getTime(),
+  );
 }

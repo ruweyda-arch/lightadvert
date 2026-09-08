@@ -55,3 +55,15 @@ export function eatMonthKey(instant: Date): string {
     month: "2-digit",
   }).format(instant);
 }
+
+/**
+ * A `@db.Date` value (Postgres stores it as UTC-midnight of the calendar day)
+ * reinterpreted as EAT-midnight of that same day, returned as a UTC instant.
+ * Used to line pay-period lock windows up with EAT month boundaries.
+ */
+export function dbDateToEatStartUtc(dbDate: Date): Date {
+  return new Date(
+    Date.UTC(dbDate.getUTCFullYear(), dbDate.getUTCMonth(), dbDate.getUTCDate()) -
+      OFFSET_MS,
+  );
+}
