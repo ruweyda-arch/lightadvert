@@ -64,6 +64,30 @@ export function assignableProjects() {
   });
 }
 
+/** Per–Staff Member task counts by status (docs/prd.md R42). */
+export async function workloadByStaff() {
+  const [staff, grouped] = await Promise.all([
+    prisma.user.findMany({
+      where: { role: "STAFF" },
+      orderBy: [{ status: "asc" }, { name: "asc" }],
+      select: { id: true, name: true, status: true },
+    }),
+    prisma.task.groupBy({
+      by: ["assigneeId", "status"],
+      _count: { _all: true },
+    }),
+  ]);
+
+  const counts = new Map<string, Record<string, number>>();
+  for (const g of grouped) {
+    const row = counts.get(g.assigneeId) ?? {};
+    row[g.status] = g._count._all;
+    counts.set(g.assigneeId, row);
+  }
+
+  return staff.map((s) => ({ ...s, counts: counts.get(s.id) ?? {} }));
+}
+
 /** Active Staff Members, with their Roles for the stamped-Role default + warning. */
 export function assignableStaff() {
   return prisma.user.findMany({

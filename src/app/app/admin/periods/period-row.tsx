@@ -14,14 +14,11 @@ export function PeriodRow({ lock }: { lock: PayPeriodLockRow }) {
   const [state, action, pending] = useActionState(unlockAction, null);
   const [open, setOpen] = useState(false);
   const active = lock.unlockedAt === null;
+  const formOpen = open && !state?.ok;
 
   useEffect(() => {
-    if (state?.ok) {
-      toast.success("Period unlocked.");
-      setOpen(false);
-    } else if (state && !state.ok) {
-      toast.error(state.error);
-    }
+    if (state?.ok) toast.success("Period unlocked.");
+    else if (state && !state.ok) toast.error(state.error);
   }, [state]);
 
   return (
@@ -43,7 +40,7 @@ export function PeriodRow({ lock }: { lock: PayPeriodLockRow }) {
             className="ml-auto"
             onClick={() => setOpen((v) => !v)}
           >
-            {open ? "Cancel" : "Unlock"}
+            {formOpen ? "Cancel" : "Unlock"}
           </Button>
         ) : null}
       </div>
@@ -56,7 +53,7 @@ export function PeriodRow({ lock }: { lock: PayPeriodLockRow }) {
         </p>
       ) : null}
 
-      {open ? (
+      {formOpen ? (
         <form action={action} className="flex flex-wrap items-end gap-2">
           <input type="hidden" name="id" value={lock.id} />
           <Input
