@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { NativeSelect } from "@/components/ui/native-select";
 import { Textarea } from "@/components/ui/textarea";
 import {
   reassignTaskAction,
@@ -16,9 +17,6 @@ import {
 import type { ActionResult } from "@/server/actions/result";
 
 import { EFFORT_SCALE, TASK_PRIORITIES } from "../task-fields";
-
-const selectClass =
-  "border-input h-9 w-full rounded-md border bg-transparent px-2 text-sm";
 
 function useToasted(state: ActionResult | null, message: string) {
   useEffect(() => {
@@ -80,33 +78,23 @@ export function TaskEdit({
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="space-y-1.5">
             <Label htmlFor="te-project">Project</Label>
-            <select
-              id="te-project"
-              name="projectId"
-              defaultValue={task.projectId}
-              className={selectClass}
-            >
+            <NativeSelect id="te-project" name="projectId" defaultValue={task.projectId}>
               {projects.map((p) => (
                 <option key={p.id} value={p.id}>
                   {p.name}
                 </option>
               ))}
-            </select>
+            </NativeSelect>
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="te-priority">Priority</Label>
-            <select
-              id="te-priority"
-              name="priority"
-              defaultValue={task.priority}
-              className={selectClass}
-            >
+            <NativeSelect id="te-priority" name="priority" defaultValue={task.priority}>
               {TASK_PRIORITIES.map((p) => (
                 <option key={p} value={p}>
                   {p[0] + p.slice(1).toLowerCase()}
                 </option>
               ))}
-            </select>
+            </NativeSelect>
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="te-type">Type</Label>
@@ -141,19 +129,24 @@ export function TaskEdit({
         <form action={estAction} className="space-y-3 rounded-md border p-4">
           <h3 className="text-sm font-semibold">Effort estimate</h3>
           <input type="hidden" name="id" value={task.id} />
-          <select
+          <NativeSelect
             name="effortPoints"
             defaultValue={task.effortPoints}
-            className={selectClass}
+            aria-label="Effort estimate in points"
           >
             {EFFORT_SCALE.map((n) => (
               <option key={n} value={n}>
                 {n} points
               </option>
             ))}
-          </select>
+          </NativeSelect>
           {task.audited ? (
-            <Input name="reason" placeholder="Reason (required)" required />
+            <Input
+              name="reason"
+              placeholder="Reason (required)"
+              aria-label="Reason for changing the estimate"
+              required
+            />
           ) : null}
           <Button type="submit" size="sm" disabled={estPending}>
             Update estimate
@@ -163,15 +156,24 @@ export function TaskEdit({
         <form action={reAction} className="space-y-3 rounded-md border p-4">
           <h3 className="text-sm font-semibold">Reassign</h3>
           <input type="hidden" name="id" value={task.id} />
-          <select name="assigneeId" defaultValue={task.assigneeId} className={selectClass}>
+          <NativeSelect
+            name="assigneeId"
+            defaultValue={task.assigneeId}
+            aria-label="New assignee"
+          >
             {staff.map((s) => (
               <option key={s.id} value={s.id}>
                 {s.name}
               </option>
             ))}
-          </select>
+          </NativeSelect>
           {task.audited ? (
-            <Input name="reason" placeholder="Reason (required)" required />
+            <Input
+              name="reason"
+              placeholder="Reason (required)"
+              aria-label="Reason for reassigning"
+              required
+            />
           ) : null}
           <Button type="submit" size="sm" disabled={rePending}>
             Reassign
@@ -181,19 +183,24 @@ export function TaskEdit({
         <form action={roleAction} className="space-y-3 rounded-md border p-4">
           <h3 className="text-sm font-semibold">Stamped role</h3>
           <input type="hidden" name="id" value={task.id} />
-          <select
+          <NativeSelect
             name="stampedRoleId"
             defaultValue={task.stampedRoleId}
-            className={selectClass}
+            aria-label="Stamped role"
           >
             {roles.map((r) => (
               <option key={r.id} value={r.id}>
                 {r.name}
               </option>
             ))}
-          </select>
+          </NativeSelect>
           {task.audited ? (
-            <Input name="reason" placeholder="Reason (required)" required />
+            <Input
+              name="reason"
+              placeholder="Reason (required)"
+              aria-label="Reason for changing the stamped role"
+              required
+            />
           ) : null}
           <Button type="submit" size="sm" disabled={rolePending}>
             Update role

@@ -22,6 +22,8 @@ export function ActionButton({
   variant = "outline",
   size = "sm",
   disabled,
+  ariaLabel,
+  className,
 }: {
   run: () => Promise<ActionResult<unknown>>;
   children: React.ReactNode;
@@ -30,6 +32,8 @@ export function ActionButton({
   variant?: Variant;
   size?: Size;
   disabled?: boolean;
+  ariaLabel?: string;
+  className?: string;
 }) {
   const [pending, start] = useTransition();
 
@@ -39,6 +43,8 @@ export function ActionButton({
       variant={variant}
       size={size}
       disabled={disabled || pending}
+      aria-label={ariaLabel}
+      className={className}
       onClick={() => {
         if (confirm && !window.confirm(confirm)) return;
         start(async () => {

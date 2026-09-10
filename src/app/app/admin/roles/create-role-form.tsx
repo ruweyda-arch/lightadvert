@@ -21,17 +21,23 @@ export function CreateRoleForm() {
   }, [state]);
 
   return (
-    <form ref={ref} action={action} className="flex items-start gap-2">
-      <Input
-        name="name"
-        placeholder="New role name"
-        required
-        maxLength={60}
-        className="max-w-xs"
-      />
-      <Button type="submit" disabled={pending}>
-        {pending ? "Adding…" : "Add role"}
-      </Button>
+    <form ref={ref} action={action} className="space-y-1.5">
+      <div className="flex flex-wrap items-start gap-2">
+        <Input
+          name="name"
+          placeholder="New role name"
+          required
+          maxLength={60}
+          aria-label="New role name"
+          className="w-full sm:max-w-xs"
+        />
+        <Button type="submit" disabled={pending}>
+          {pending ? "Adding…" : "Add role"}
+        </Button>
+      </div>
+      {state && !state.ok ? (
+        <p className="text-destructive text-sm">{state.error}</p>
+      ) : null}
     </form>
   );
 }

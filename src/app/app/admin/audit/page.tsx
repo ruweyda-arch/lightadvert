@@ -1,15 +1,15 @@
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
+import { NativeSelect } from "@/components/ui/native-select";
 import { eatDayStartUtc, formatEatDate } from "@/lib/dates";
+import { filterFieldClass } from "@/lib/ui";
 import { listActorOptions, listAuditEntries } from "@/server/db/audit";
 import { AUDIT_EVENT_TYPES, type AuditEventType } from "@/server/domain/audit";
 
 const DAY_MS = 86_400_000;
 const one = (v: string | string[] | undefined) =>
   typeof v === "string" && v.length > 0 ? v : undefined;
-const selectClass =
-  "border-input h-9 rounded-md border bg-transparent px-2 text-sm";
 
 export default async function AdminAuditPage({
   searchParams,
@@ -37,7 +37,7 @@ export default async function AdminAuditPage({
   ]);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Audit log</h1>
         <p className="text-muted-foreground text-sm">
@@ -46,31 +46,58 @@ export default async function AdminAuditPage({
         </p>
       </div>
 
-      <form className="flex flex-wrap items-end gap-2" method="get">
-        <select name="event" defaultValue={eventParam ?? ""} className={selectClass}>
+      <form
+        className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-end"
+        method="get"
+      >
+        <NativeSelect
+          name="event"
+          defaultValue={eventParam ?? ""}
+          aria-label="Filter by event type"
+          className="sm:w-52"
+        >
           <option value="">Any event</option>
           {AUDIT_EVENT_TYPES.map((e) => (
             <option key={e} value={e}>
               {e}
             </option>
           ))}
-        </select>
-        <select name="actor" defaultValue={actorId ?? ""} className={selectClass}>
+        </NativeSelect>
+        <NativeSelect
+          name="actor"
+          defaultValue={actorId ?? ""}
+          aria-label="Filter by actor"
+          className="sm:w-44"
+        >
           <option value="">Any actor</option>
           {actors.map((a) => (
             <option key={a.id} value={a.id}>
               {a.name}
             </option>
           ))}
-        </select>
-        <input type="date" name="from" defaultValue={fromIso ?? ""} className={selectClass} />
-        <input type="date" name="to" defaultValue={toIso ?? ""} className={selectClass} />
-        <Button type="submit" size="sm" variant="secondary">
-          Filter
-        </Button>
-        <Button asChild size="sm" variant="ghost">
-          <Link href="/app/admin/audit">Clear</Link>
-        </Button>
+        </NativeSelect>
+        <input
+          type="date"
+          name="from"
+          defaultValue={fromIso ?? ""}
+          aria-label="From date"
+          className={filterFieldClass}
+        />
+        <input
+          type="date"
+          name="to"
+          defaultValue={toIso ?? ""}
+          aria-label="To date"
+          className={filterFieldClass}
+        />
+        <div className="col-span-2 flex gap-2">
+          <Button type="submit" size="sm" variant="secondary">
+            Filter
+          </Button>
+          <Button asChild size="sm" variant="ghost">
+            <Link href="/app/admin/audit">Clear</Link>
+          </Button>
+        </div>
       </form>
 
       <div className="overflow-x-auto rounded-md border">

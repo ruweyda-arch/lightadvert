@@ -64,6 +64,19 @@ export async function loginAction(
   redirect("/app");
 }
 
+export async function logoutAction(): Promise<void> {
+  const h = await headers();
+  try {
+    await auth.api.signOut({ headers: h });
+  } catch {
+    // Already signed out / no session — fall through to clearing hints.
+  }
+  const jar = await cookies();
+  jar.delete("role_hint");
+  jar.delete("la");
+  redirect("/login");
+}
+
 export async function forgotPasswordAction(
   _prev: ActionResult | null,
   formData: FormData,

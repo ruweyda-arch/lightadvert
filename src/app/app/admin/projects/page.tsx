@@ -9,7 +9,7 @@ export default async function AdminProjectsPage() {
   const archived = projects.filter((p) => p.status === "ARCHIVED");
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <section className="space-y-4">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Projects</h1>

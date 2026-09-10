@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { NativeSelect } from "@/components/ui/native-select";
 import { Textarea } from "@/components/ui/textarea";
 import { createProjectAction, updateProjectAction } from "@/server/actions/projects";
 import { PROJECT_PRIORITIES } from "@/server/validation/project";
@@ -54,7 +55,7 @@ export function ProjectForm({
         <Input id="pf-name" name="name" defaultValue={project?.name} required maxLength={120} />
       </div>
 
-      <div className="flex gap-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div className="space-y-1.5">
           <Label htmlFor="pf-deadline">Deadline</Label>
           <Input
@@ -67,18 +68,17 @@ export function ProjectForm({
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="pf-priority">Priority</Label>
-          <select
+          <NativeSelect
             id="pf-priority"
             name="priority"
             defaultValue={project?.priority ?? "NORMAL"}
-            className="border-input h-9 rounded-md border bg-transparent px-2 text-sm"
           >
             {PROJECT_PRIORITIES.map((p) => (
               <option key={p} value={p}>
                 {titleCase(p)}
               </option>
             ))}
-          </select>
+          </NativeSelect>
         </div>
       </div>
 

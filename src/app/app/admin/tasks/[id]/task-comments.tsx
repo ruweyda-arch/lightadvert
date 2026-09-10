@@ -49,7 +49,7 @@ export function TaskComments({
               <div className="text-muted-foreground text-xs">
                 {c.author.name} · {formatEatDate(c.createdAt)}
               </div>
-              <div className="whitespace-pre-wrap">{c.body}</div>
+              <div className="wrap-break-word whitespace-pre-wrap">{c.body}</div>
             </li>
           ))}
         </ul>

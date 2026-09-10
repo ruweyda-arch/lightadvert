@@ -46,16 +46,21 @@ export function TaskLifecycle({
     <div className="flex flex-wrap items-center gap-2">
       {adminMoves.map((t) =>
         t.reasonRequired ? (
-          <form key={t.to} action={action} className="flex items-center gap-2">
+          <form
+            key={t.to}
+            action={action}
+            className="flex w-full flex-wrap items-center gap-2 sm:w-auto"
+          >
             <input type="hidden" name="id" value={taskId} />
             <input type="hidden" name="to" value={t.to} />
             <Input
               name="reason"
               placeholder="Reason to cancel an approved task"
+              aria-label="Reason to cancel an approved task"
               required
               value={cancelReason}
               onChange={(e) => setCancelReason(e.target.value)}
-              className="w-72"
+              className="w-full sm:w-72"
             />
             <Button type="submit" variant="destructive" size="sm" disabled={pending}>
               {LABEL[t.to]}

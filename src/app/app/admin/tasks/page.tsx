@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { NativeSelect } from "@/components/ui/native-select";
 import { formatEatDate } from "@/lib/dates";
 import { listRoles } from "@/server/db/role";
 import {
@@ -24,9 +25,6 @@ const STATUSES: TaskStatus[] = [
 
 const one = (v: string | string[] | undefined) =>
   typeof v === "string" && v.length > 0 ? v : undefined;
-
-const selectClass =
-  "border-input h-9 rounded-md border bg-transparent px-2 text-sm";
 
 export default async function AdminTasksPage({
   searchParams,
@@ -62,45 +60,70 @@ export default async function AdminTasksPage({
 
       <CreateTaskForm projects={projects} staff={staff} roles={formRoles} />
 
-      <form className="flex flex-wrap items-end gap-2" method="get">
-        <select name="status" defaultValue={statusParam ?? ""} className={selectClass}>
+      <form
+        className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-end"
+        method="get"
+      >
+        <NativeSelect
+          name="status"
+          defaultValue={statusParam ?? ""}
+          aria-label="Filter by status"
+          className="sm:w-40"
+        >
           <option value="">Any status</option>
           {STATUSES.map((s) => (
             <option key={s} value={s}>
               {s}
             </option>
           ))}
-        </select>
-        <select name="project" defaultValue={filters.projectId ?? ""} className={selectClass}>
+        </NativeSelect>
+        <NativeSelect
+          name="project"
+          defaultValue={filters.projectId ?? ""}
+          aria-label="Filter by project"
+          className="sm:w-40"
+        >
           <option value="">Any project</option>
           {projects.map((p) => (
             <option key={p.id} value={p.id}>
               {p.name}
             </option>
           ))}
-        </select>
-        <select name="assignee" defaultValue={filters.assigneeId ?? ""} className={selectClass}>
+        </NativeSelect>
+        <NativeSelect
+          name="assignee"
+          defaultValue={filters.assigneeId ?? ""}
+          aria-label="Filter by assignee"
+          className="sm:w-40"
+        >
           <option value="">Any assignee</option>
           {staff.map((s) => (
             <option key={s.id} value={s.id}>
               {s.name}
             </option>
           ))}
-        </select>
-        <select name="role" defaultValue={filters.stampedRoleId ?? ""} className={selectClass}>
+        </NativeSelect>
+        <NativeSelect
+          name="role"
+          defaultValue={filters.stampedRoleId ?? ""}
+          aria-label="Filter by stamped role"
+          className="sm:w-40"
+        >
           <option value="">Any role</option>
           {formRoles.map((r) => (
             <option key={r.id} value={r.id}>
               {r.name}
             </option>
           ))}
-        </select>
-        <Button type="submit" size="sm" variant="secondary">
-          Filter
-        </Button>
-        <Button asChild size="sm" variant="ghost">
-          <Link href="/app/admin/tasks">Clear</Link>
-        </Button>
+        </NativeSelect>
+        <div className="col-span-2 flex gap-2">
+          <Button type="submit" size="sm" variant="secondary">
+            Filter
+          </Button>
+          <Button asChild size="sm" variant="ghost">
+            <Link href="/app/admin/tasks">Clear</Link>
+          </Button>
+        </div>
       </form>
 
       <div className="divide-y rounded-md border">
@@ -111,9 +134,9 @@ export default async function AdminTasksPage({
             <Link
               key={t.id}
               href={`/app/admin/tasks/${t.id}`}
-              className="hover:bg-muted/40 flex flex-wrap items-center gap-3 p-3 text-sm"
+              className="hover:bg-muted/40 flex flex-wrap items-center gap-x-3 gap-y-1 p-3 text-sm"
             >
-              <span className="min-w-56 font-medium">{t.title}</span>
+              <span className="basis-full font-medium sm:basis-auto">{t.title}</span>
               <Badge variant="outline">{t.status}</Badge>
               <span className="text-muted-foreground">
                 {t.project.name} · {t.assignee.name} · {t.stampedRole.name} ·{" "}
@@ -127,7 +150,7 @@ export default async function AdminTasksPage({
               {t.manuallyRecorded ? (
                 <span className="text-xs text-amber-600">manual</span>
               ) : null}
-              <span className="text-muted-foreground ml-auto text-xs">
+              <span className="text-muted-foreground text-xs sm:ml-auto">
                 {t._count.deliverables} deliv · {t._count.comments} comm
               </span>
             </Link>

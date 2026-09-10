@@ -1,12 +1,14 @@
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
+import { NativeSelect } from "@/components/ui/native-select";
 import {
   currentEatMonthBounds,
   eatDateIso,
   eatDayStartUtc,
   formatEatDate,
 } from "@/lib/dates";
+import { filterFieldClass } from "@/lib/ui";
 import { getApprovedTaskRows, getRoster } from "@/server/db/contribution";
 import { listRoles } from "@/server/db/role";
 import {
@@ -18,8 +20,6 @@ const one = (v: string | string[] | undefined) =>
   typeof v === "string" && v.length > 0 ? v : undefined;
 
 const DAY_MS = 86_400_000;
-const selectClass =
-  "border-input h-9 rounded-md border bg-transparent px-2 text-sm";
 
 export default async function AdminReportsPage({
   searchParams,
@@ -71,35 +71,40 @@ export default async function AdminReportsPage({
         </p>
       </div>
 
-      <form className="flex flex-wrap items-end gap-2" method="get">
+      <form
+        className="grid gap-2 sm:flex sm:flex-wrap sm:items-end"
+        method="get"
+      >
         <label className="text-sm">
           <span className="mb-1 block font-medium">From</span>
-          <input type="date" name="from" defaultValue={fromValue} className={selectClass} />
+          <input type="date" name="from" defaultValue={fromValue} className={filterFieldClass} />
         </label>
         <label className="text-sm">
           <span className="mb-1 block font-medium">To</span>
-          <input type="date" name="to" defaultValue={toValue} className={selectClass} />
+          <input type="date" name="to" defaultValue={toValue} className={filterFieldClass} />
         </label>
         <label className="text-sm">
           <span className="mb-1 block font-medium">Role</span>
-          <select name="role" defaultValue={roleId ?? ""} className={selectClass}>
+          <NativeSelect name="role" defaultValue={roleId ?? ""} className="sm:w-44">
             <option value="">All roles</option>
             {roles.map((r) => (
               <option key={r.id} value={r.id}>
                 {r.name}
               </option>
             ))}
-          </select>
+          </NativeSelect>
         </label>
-        <Button type="submit" size="sm" variant="secondary">
-          Apply
-        </Button>
-        <Button type="button" asChild size="sm" variant="ghost">
-          <Link href="/app/admin/reports">This month</Link>
-        </Button>
-        <Button asChild size="sm">
-          <a href={exportHref}>Download CSV</a>
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button type="submit" size="sm" variant="secondary">
+            Apply
+          </Button>
+          <Button type="button" asChild size="sm" variant="ghost">
+            <Link href="/app/admin/reports">This month</Link>
+          </Button>
+          <Button asChild size="sm">
+            <a href={exportHref}>Download CSV</a>
+          </Button>
+        </div>
       </form>
 
       <div className="text-muted-foreground text-sm">
@@ -122,13 +127,8 @@ export default async function AdminReportsPage({
           const tasks = byPerson.get(p.userId) ?? [];
           return (
             <details key={p.userId} className="p-3">
-              <summary className="flex cursor-pointer flex-wrap items-center gap-3 text-sm">
-                <Link
-                  href={`/app/admin/staff/${p.userId}`}
-                  className="min-w-40 font-medium hover:underline"
-                >
-                  {p.name}
-                </Link>
+              <summary className="flex cursor-pointer flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+                <span className="font-medium">{p.name}</span>
                 <span className="font-semibold">{p.total} pts</span>
                 <span className="text-muted-foreground">
                   {p.taskCount} task{p.taskCount === 1 ? "" : "s"}
@@ -137,22 +137,30 @@ export default async function AdminReportsPage({
                   {p.byRole.map((r) => `${r.roleName} ${r.points}`).join(" · ")}
                 </span>
               </summary>
-              {tasks.length > 0 ? (
-                <ul className="mt-2 space-y-1 pl-4 text-sm">
-                  {tasks.map((t) => (
-                    <li key={t.taskId} className="text-muted-foreground">
-                      <Link
-                        href={`/app/admin/tasks/${t.taskId}`}
-                        className="text-foreground hover:underline"
-                      >
-                        {t.taskTitle}
-                      </Link>{" "}
-                      · {t.projectName} · {t.stampedRoleName} · {t.effortPoints} pts ·{" "}
-                      {formatEatDate(t.approvalDate)}
-                    </li>
-                  ))}
-                </ul>
-              ) : null}
+              <div className="mt-2 space-y-1 pl-4 text-sm">
+                <Link
+                  href={`/app/admin/staff/${p.userId}`}
+                  className="text-muted-foreground hover:underline"
+                >
+                  View {p.name}&apos;s full history →
+                </Link>
+                {tasks.length > 0 ? (
+                  <ul className="space-y-1">
+                    {tasks.map((t) => (
+                      <li key={t.taskId} className="text-muted-foreground">
+                        <Link
+                          href={`/app/admin/tasks/${t.taskId}`}
+                          className="text-foreground hover:underline"
+                        >
+                          {t.taskTitle}
+                        </Link>{" "}
+                        · {t.projectName} · {t.stampedRoleName} · {t.effortPoints} pts ·{" "}
+                        {formatEatDate(t.approvalDate)}
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+              </div>
             </details>
           );
         })}

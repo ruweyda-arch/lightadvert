@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { NativeSelect } from "@/components/ui/native-select";
 import { createStaffAction, updateStaffAction } from "@/server/actions/staff";
 
 export interface StaffFormRole {
@@ -77,14 +78,15 @@ export function StaffForm({
         <Input id="sf-name" name="name" defaultValue={staff?.name} required />
       </div>
 
-      <fieldset className="space-y-1">
-        <legend className="text-sm font-medium">Roles</legend>
+      <fieldset className="space-y-1.5">
+        <legend className="mb-1 text-sm font-medium">Roles</legend>
         {roles.map((r) => (
           <label key={r.id} className="flex items-center gap-2 text-sm">
             <input
               type="checkbox"
               checked={selected.has(r.id)}
               onChange={() => toggle(r.id)}
+              className="accent-primary size-4"
             />
             {r.name}
           </label>
@@ -93,12 +95,11 @@ export function StaffForm({
 
       <div className="space-y-1.5">
         <Label htmlFor="sf-primary">Primary role</Label>
-        <select
+        <NativeSelect
           id="sf-primary"
           value={primary}
           onChange={(e) => setPrimary(e.target.value)}
           required
-          className="border-input h-9 rounded-md border bg-transparent px-2 text-sm"
         >
           <option value="" disabled>
             Select…
@@ -108,7 +109,7 @@ export function StaffForm({
               {roles.find((r) => r.id === id)?.name ?? id}
             </option>
           ))}
-        </select>
+        </NativeSelect>
       </div>
 
       {state && !state.ok ? (

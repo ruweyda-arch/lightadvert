@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { NativeSelect } from "@/components/ui/native-select";
 import { Textarea } from "@/components/ui/textarea";
 
 export const EFFORT_SCALE = [1, 2, 3, 5, 8, 13] as const;
@@ -25,9 +26,6 @@ export interface FieldStaff {
     roleAssignments: { roleId: string }[];
   } | null;
 }
-
-const selectClass =
-  "border-input h-9 w-full rounded-md border bg-transparent px-2 text-sm";
 
 /** The common Task fields, shared by the assign form and the backfill form. */
 export function TaskFields({
@@ -66,23 +64,22 @@ export function TaskFields({
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="space-y-1.5">
           <Label htmlFor="tf-project">Project</Label>
-          <select id="tf-project" name="projectId" required className={selectClass}>
+          <NativeSelect id="tf-project" name="projectId" required>
             <option value="">Select…</option>
             {projects.map((p) => (
               <option key={p.id} value={p.id}>
                 {p.name}
               </option>
             ))}
-          </select>
+          </NativeSelect>
         </div>
 
         <div className="space-y-1.5">
           <Label htmlFor="tf-assignee">Assignee</Label>
-          <select
+          <NativeSelect
             id="tf-assignee"
             name="assigneeId"
             required
-            className={selectClass}
             value={assigneeId}
             onChange={(e) => onAssignee(e.target.value)}
           >
@@ -92,16 +89,15 @@ export function TaskFields({
                 {s.name}
               </option>
             ))}
-          </select>
+          </NativeSelect>
         </div>
 
         <div className="space-y-1.5">
           <Label htmlFor="tf-role">Stamped role</Label>
-          <select
+          <NativeSelect
             id="tf-role"
             name="stampedRoleId"
             required
-            className={selectClass}
             value={stampedRoleId}
             onChange={(e) => setStampedRoleId(e.target.value)}
           >
@@ -111,7 +107,7 @@ export function TaskFields({
                 {r.name}
               </option>
             ))}
-          </select>
+          </NativeSelect>
           {mismatch ? (
             <p className="text-xs text-amber-600">
               Not one of {assignee?.name}&apos;s roles — allowed, but double-check.
@@ -121,13 +117,13 @@ export function TaskFields({
 
         <div className="space-y-1.5">
           <Label htmlFor="tf-effort">Effort (points)</Label>
-          <select id="tf-effort" name="effortPoints" required className={selectClass}>
+          <NativeSelect id="tf-effort" name="effortPoints" required>
             {EFFORT_SCALE.map((n) => (
               <option key={n} value={n}>
                 {n}
               </option>
             ))}
-          </select>
+          </NativeSelect>
         </div>
 
         <div className="space-y-1.5">
@@ -137,18 +133,13 @@ export function TaskFields({
 
         <div className="space-y-1.5">
           <Label htmlFor="tf-priority">Priority</Label>
-          <select
-            id="tf-priority"
-            name="priority"
-            defaultValue="NORMAL"
-            className={selectClass}
-          >
+          <NativeSelect id="tf-priority" name="priority" defaultValue="NORMAL">
             {TASK_PRIORITIES.map((p) => (
               <option key={p} value={p}>
                 {p[0] + p.slice(1).toLowerCase()}
               </option>
             ))}
-          </select>
+          </NativeSelect>
         </div>
 
         <div className="space-y-1.5">

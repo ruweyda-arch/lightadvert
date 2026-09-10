@@ -1,5 +1,6 @@
 "use client";
 
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { useActionState, useEffect } from "react";
 import { toast } from "sonner";
 
@@ -39,29 +40,32 @@ export function RoleRow({
         <ActionButton
           run={() => reorderRoleAction(role.id, "up")}
           disabled={first}
-          size="sm"
+          size="icon-xs"
           variant="ghost"
+          ariaLabel={`Move ${role.name} up`}
         >
-          ▲
+          <ChevronUp />
         </ActionButton>
         <ActionButton
           run={() => reorderRoleAction(role.id, "down")}
           disabled={last}
-          size="sm"
+          size="icon-xs"
           variant="ghost"
+          ariaLabel={`Move ${role.name} down`}
         >
-          ▼
+          <ChevronDown />
         </ActionButton>
       </div>
 
-      <form action={action} className="flex items-center gap-2">
+      <form action={action} className="flex flex-1 items-center gap-2 sm:flex-none">
         <input type="hidden" name="id" value={role.id} />
         <Input
           name="name"
           defaultValue={role.name}
           required
           maxLength={60}
-          className="w-56"
+          aria-label={`Rename ${role.name}`}
+          className="flex-1 sm:w-56 sm:flex-none"
         />
         <Button type="submit" size="sm" variant="secondary" disabled={pending}>
           Save

@@ -1,5 +1,6 @@
 "use client";
 
+import { X } from "lucide-react";
 import { useActionState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 
@@ -24,7 +25,13 @@ function AddTaskTypeForm({ roleId }: { roleId: string }) {
   return (
     <form ref={ref} action={action} className="flex items-center gap-2">
       <input type="hidden" name="roleId" value={roleId} />
-      <Input name="label" placeholder="Add a task type" maxLength={60} className="w-56" />
+      <Input
+        name="label"
+        placeholder="Add a task type"
+        maxLength={60}
+        aria-label="New task type"
+        className="flex-1 sm:w-56 sm:flex-none"
+      />
       <Button type="submit" size="sm" variant="secondary" disabled={pending}>
         Add
       </Button>
@@ -54,15 +61,16 @@ export function TaskTypesSection({ roles }: { roles: RoleWithCounts[] }) {
                 role.taskTypes.map((tt) => (
                   <span
                     key={tt.id}
-                    className="bg-secondary flex items-center gap-1 rounded px-2 py-1 text-sm"
+                    className="bg-secondary flex items-center gap-1 rounded py-1 pr-1 pl-2 text-sm"
                   >
                     {tt.label}
                     <ActionButton
                       run={() => removeTaskTypeAction(tt.id)}
                       variant="ghost"
-                      size="sm"
+                      size="icon-xs"
+                      ariaLabel={`Remove ${tt.label}`}
                     >
-                      ✕
+                      <X />
                     </ActionButton>
                   </span>
                 ))

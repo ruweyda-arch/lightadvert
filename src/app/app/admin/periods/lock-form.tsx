@@ -37,7 +37,7 @@ export function LockForm() {
 
       <form action={rangeAction} className="space-y-2 rounded-md border p-4">
         <h3 className="text-sm font-semibold">Lock a custom range</h3>
-        <div className="flex gap-2">
+        <div className="grid grid-cols-2 gap-2">
           <div className="space-y-1.5">
             <Label htmlFor="lp-from">From</Label>
             <Input id="lp-from" name="from" type="date" required />

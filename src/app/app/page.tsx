@@ -41,10 +41,11 @@ export default async function AppHome() {
   const lifetime = approved.reduce((s, t) => s + t.effortPoints, 0);
 
   const open = tasks.filter((t) => OPEN.includes(t.status as TaskStatus));
-  const done = tasks.filter((t) => DONE.includes(t.status as TaskStatus));
+  const doneAll = tasks.filter((t) => DONE.includes(t.status as TaskStatus));
+  const done = doneAll.slice(0, 15);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">
           Welcome, {session.user.name}
@@ -87,23 +88,32 @@ export default async function AppHome() {
       </section>
 
       <section className="space-y-2">
-        <h2 className="text-lg font-semibold tracking-tight">Recent ({done.length})</h2>
-        {done.length === 0 ? (
+        <h2 className="text-lg font-semibold tracking-tight">
+          Recent ({doneAll.length})
+        </h2>
+        {doneAll.length === 0 ? (
           <p className="text-muted-foreground text-sm">None yet.</p>
         ) : (
-          <ul className="space-y-1 text-sm">
-            {done.map((t) => (
-              <li key={t.id} className="text-muted-foreground">
-                <Link
-                  href={`/app/tasks/${t.id}`}
-                  className="text-foreground hover:underline"
-                >
-                  {t.title}
-                </Link>{" "}
-                · {t.status} · {t.stampedRole.name} · {t.effortPoints} pts
-              </li>
-            ))}
-          </ul>
+          <>
+            <ul className="space-y-1 text-sm">
+              {done.map((t) => (
+                <li key={t.id} className="text-muted-foreground">
+                  <Link
+                    href={`/app/tasks/${t.id}`}
+                    className="text-foreground hover:underline"
+                  >
+                    {t.title}
+                  </Link>{" "}
+                  · {t.status} · {t.stampedRole.name} · {t.effortPoints} pts
+                </li>
+              ))}
+            </ul>
+            {doneAll.length > done.length ? (
+              <p className="text-muted-foreground text-xs">
+                …and {doneAll.length - done.length} more.
+              </p>
+            ) : null}
+          </>
         )}
       </section>
     </div>

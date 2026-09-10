@@ -14,7 +14,7 @@ export default async function AdminWorkloadPage() {
   const rows = await workloadByStaff();
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Workload</h1>
         <p className="text-muted-foreground text-sm">
@@ -26,10 +26,13 @@ export default async function AdminWorkloadPage() {
         <table className="w-full text-sm">
           <thead className="bg-muted/40 text-left">
             <tr>
-              <th className="p-2 font-medium">Staff member</th>
+              <th className="p-2 font-medium whitespace-nowrap">Staff member</th>
               {COLUMNS.map((c) => (
-                <th key={c} className="p-2 text-right font-medium">
-                  {c.replace("_", " ")}
+                <th
+                  key={c}
+                  className="p-2 text-right font-medium whitespace-nowrap capitalize"
+                >
+                  {c.replace("_", " ").toLowerCase()}
                 </th>
               ))}
               <th className="p-2 text-right font-medium">Total</th>

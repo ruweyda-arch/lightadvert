@@ -31,7 +31,7 @@ export default async function TaskDetailPage({
   const deletable = ["ASSIGNED", "IN_PROGRESS", "REVIEW"].includes(status);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <div className="space-y-2">
         <Link
           href="/app/admin/tasks"

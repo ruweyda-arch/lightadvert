@@ -14,7 +14,7 @@ export default async function AdminStaffPage() {
   const formRoles = roles.map((r) => ({ id: r.id, name: r.name }));
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <section className="space-y-4">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Staff</h1>

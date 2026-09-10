@@ -43,9 +43,9 @@ export function TaskDeliverables({
       {deliverables.length === 0 ? (
         <p className="text-muted-foreground text-sm">No links yet.</p>
       ) : (
-        <ul className="space-y-1 text-sm">
+        <ul className="space-y-1.5 text-sm">
           {deliverables.map((d) => (
-            <li key={d.id} className="flex items-center gap-2">
+            <li key={d.id} className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
               <a
                 href={d.url}
                 target="_blank"
@@ -54,7 +54,7 @@ export function TaskDeliverables({
               >
                 {d.label}
               </a>
-              <span className="text-muted-foreground truncate text-xs">{d.url}</span>
+              <span className="text-muted-foreground text-xs break-all">{d.url}</span>
               <span className="text-muted-foreground text-xs">
                 · {d.createdBy.name}, {formatEatDate(d.createdAt)}
               </span>
@@ -62,6 +62,7 @@ export function TaskDeliverables({
                 run={() => removeDeliverableAction(d.id)}
                 variant="ghost"
                 size="sm"
+                ariaLabel={`Remove ${d.label}`}
               >
                 Remove
               </ActionButton>
@@ -70,15 +71,27 @@ export function TaskDeliverables({
         </ul>
       )}
 
-      <form ref={ref} action={action} className="flex flex-wrap items-end gap-2">
+      <form
+        ref={ref}
+        action={action}
+        className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-end"
+      >
         <input type="hidden" name="taskId" value={taskId} />
-        <Input name="label" placeholder="Label" required maxLength={120} className="w-40" />
+        <Input
+          name="label"
+          placeholder="Label"
+          aria-label="Deliverable label"
+          required
+          maxLength={120}
+          className="w-full sm:w-40"
+        />
         <Input
           name="url"
           type="url"
           placeholder="https://…"
+          aria-label="Deliverable URL"
           required
-          className="w-72"
+          className="w-full sm:w-72"
         />
         <Button type="submit" size="sm" variant="secondary" disabled={pending}>
           Add link

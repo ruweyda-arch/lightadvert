@@ -23,7 +23,7 @@ export default async function StaffTaskPage({
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <div className="space-y-2">
         <Link href="/app" className="text-muted-foreground text-sm hover:underline">
           ← My work

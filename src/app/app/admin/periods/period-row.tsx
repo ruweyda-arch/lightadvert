@@ -59,8 +59,9 @@ export function PeriodRow({ lock }: { lock: PayPeriodLockRow }) {
           <Input
             name="reason"
             placeholder="Reason for unlocking (required)"
+            aria-label="Reason for unlocking"
             required
-            className="w-80"
+            className="w-full sm:w-80"
           />
           <Button type="submit" size="sm" variant="destructive" disabled={pending}>
             Confirm unlock
