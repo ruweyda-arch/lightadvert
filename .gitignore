@@ -46,6 +46,8 @@ next-env.d.ts
 /test-results
 /blob-report
 /playwright/.cache
+/tests/acceptance/.auth
+/tests/acceptance/.fixture.json
 
 # prisma
 /prisma/*.db

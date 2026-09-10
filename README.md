@@ -17,7 +17,9 @@ so bonus-pool decisions are consistent, auditable, and hard to game.
 | [docs/architecture.md](docs/architecture.md) | System architecture — stack, topology, core workflows, auth, audit design |
 | [docs/data-model.md](docs/data-model.md) | Entities, fields, enums, relationships, invariants, ERD |
 | [docs/constraints.md](docs/constraints.md) | Non-functional requirements, security, privacy, operational limits, anti-requirements |
-| [docs/roadmap.md](docs/roadmap.md) | Phasing, parked scope, deferred decisions, pre-go-live checklist |
+| [docs/roadmap.md](docs/roadmap.md) | Phasing, parked scope, deferred decisions |
+| [docs/phase-1-plan.md](docs/phase-1-plan.md) · [docs/phase-2-plan.md](docs/phase-2-plan.md) | Milestone-by-milestone build plans |
+| [docs/go-live.md](docs/go-live.md) | Deploy runbook + acceptance sign-off checklist |
 | [docs/adr/](docs/adr/) | Architecture decision records |
 
 ## Stack (Phase 1)
@@ -29,9 +31,15 @@ See [docs/architecture.md](docs/architecture.md) §2 for the full table and vers
 
 ## Status
 
-Scaffold in place and green: `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm build`, and
-the Playwright smoke test all pass. Feature screens are stubs — see
-[docs/prd.md](docs/prd.md) requirement IDs and [docs/roadmap.md](docs/roadmap.md).
+**Phase 1 feature-complete pending a database.** Milestones M1–M8 are built —
+auth + reset flow, Roles & Staff, Projects, Tasks (lifecycle, audited edits,
+deliverables, comments, backfill), Contribution Report + CSV, pay-period lock/unlock,
+Workload Board, Staff home, Audit log. `pnpm typecheck`, `pnpm lint`, `pnpm test`
+(30 unit), `pnpm build`, and the smoke e2e all pass.
+
+Not yet run against a real database — do the [go-live runbook](docs/go-live.md)
+(Supabase → `pnpm db:deploy && pnpm db:seed` → Vercel). The A1–A8 acceptance suite
+(`pnpm test:acceptance`) runs in CI against a throwaway Postgres.
 
 ## Local development
 

@@ -4,11 +4,13 @@ Sequenced, dependency-ordered build plan for the internal tool. Each milestone l
 **Goal**, **Build**, **Honors** (PRD requirements + invariants + ADRs it must not break),
 and **Done when**.
 
+
 Reference docs: [prd.md](prd.md) (R1–R45, A1–A8), [data-model.md](data-model.md),
 [architecture.md](architecture.md), [adr/](adr/). Domain rules already exist as pure,
 tested functions in `src/server/domain/` — **wire to them, do not reimplement**.
 
 ---
+
 
 ## Conventions to establish first (part of Milestone 1)
 

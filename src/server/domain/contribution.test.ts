@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  contributionCsv,
   summariseContribution,
   type ApprovedTaskRow,
   type RosterEntry,
@@ -78,5 +79,52 @@ describe("summariseContribution", () => {
     );
     expect(people[0]).toMatchObject({ name: "Dex (left)", total: 13 });
     expect(people).toHaveLength(4);
+  });
+});
+
+describe("acceptance criteria", () => {
+  it("A6 — attribution follows the Task's stamped Role, not the person", () => {
+    // Ann's profile is Content Creator, but this Task is stamped Video Editor.
+    const { people, byRole } = summariseContribution(
+      [
+        row({
+          assigneeId: "u-ann",
+          assigneeName: "Ann",
+          stampedRoleId: "r-edit",
+          stampedRoleName: "Video Editor",
+          effortPoints: 8,
+        }),
+      ],
+      roster,
+    );
+    const ann = people.find((p) => p.name === "Ann")!;
+    expect(ann.byRole).toEqual([
+      { roleId: "r-edit", roleName: "Video Editor", points: 8 },
+    ]);
+    expect(byRole).toEqual([
+      { roleId: "r-edit", roleName: "Video Editor", points: 8 },
+    ]);
+  });
+
+  it("A7 — CSV per-person and grand totals reconcile with the summary", () => {
+    const rows = [
+      row({ assigneeId: "u-ann", assigneeName: "Ann", effortPoints: 5 }),
+      row({ assigneeId: "u-ann", assigneeName: "Ann", effortPoints: 3 }),
+      row({ assigneeId: "u-ben", assigneeName: "Ben", effortPoints: 8 }),
+    ];
+    const summary = summariseContribution(rows, roster);
+    const csv = contributionCsv(rows, roster).split("\n");
+
+    const totalLine = (name: string) =>
+      csv.find((l) => l.startsWith(`${name},`) && l.endsWith(",TOTAL"))!;
+
+    expect(totalLine("Ann")).toBe("Ann,,,,8,TOTAL");
+    expect(totalLine("Ben")).toBe("Ben,,,,8,TOTAL");
+    expect(csv.find((l) => l.endsWith(",GRAND TOTAL"))).toBe(
+      `Company,,,,${summary.companyTotal},GRAND TOTAL`,
+    );
+    expect(summary.companyTotal).toBe(16);
+    // header + one data row per approved task + 3 person totals + grand total
+    expect(csv.filter((l) => l.length > 0)).toHaveLength(1 + rows.length + 3 + 1);
   });
 });

@@ -34,11 +34,10 @@ production Vercel + Supabase with PITR enabled.
 
 ## Pre-go-live checklist
 
-- [ ] Draft & publish the internal **staff privacy notice** (Kenya DPA 2019).
-- [ ] Set production seed env vars (`SEED_ADMIN_EMAIL`, `SEED_ADMIN_NAME`) and run the seed.
-- [ ] Verify Supabase PITR is enabled; take a test restore.
-- [ ] Confirm Resend domain verification for the sending address.
-- [ ] Restrict Supabase DB roles so only the app role can write; confirm the audit table has
-      no app-level update / delete path.
-- [ ] Decide the first real Pay Period start, and whether a backfill month is needed.
-- [ ] Sentry project created, DSN set, a test error captured.
+The full runbook with commands and the ticklist is in
+[go-live.md](go-live.md). In brief: provision Supabase (+ PITR) and apply the
+migration + seed; deploy to Vercel and enable both CI workflows; verify Resend and
+Sentry; revoke `UPDATE`/`DELETE` on `audit_entry` and `comment` for the app DB role;
+decide the first Pay Period; draft and circulate the
+[staff privacy notice](staff-privacy-notice.draft.md); and get `pnpm test` +
+`pnpm test:acceptance` green plus a manual A1/A2/A3/A8 walkthrough signed off.
