@@ -51,6 +51,18 @@ pnpm db:seed                  # 7 Roles + first Admin (SEED_ADMIN_EMAIL) + Inter
 pnpm dev                      # http://localhost:3000
 ```
 
+No Postgres and no Docker? `pnpm db:dev` runs a real Postgres 17 binary as a
+subprocess (via `embedded-postgres`), data in `.pgdata/`. In a second terminal
+point `.env` at it and migrate + seed:
+
+```
+DATABASE_URL="postgresql://postgres:postgres@localhost:5433/lightadvert"
+DIRECT_URL="postgresql://postgres:postgres@localhost:5433/lightadvert"
+pnpm db:deploy && pnpm db:seed
+pnpm tsx scripts/set-password.ts <SEED_ADMIN_EMAIL> "<a password>"
+pnpm dev
+```
+
 Checks:
 
 ```
